@@ -1,15 +1,18 @@
-#include<cstdio>
-#include <string>
-
-// If current token is an identifier IndetifierStr holds the name of the identifier.
+#include "lexer/token.hpp"
+#include "lexer/lexer.hpp"
+// If current token is an identifier IdentifierStr holds the name of the identifier.
 // Otherwise, if its numerical (e.g., 1.0) NumVal holds its value.
-static std::string IndetifierStr; // Filled in if tok_identifier
+std::string IdentifierStr; // Filled in if tok_identifier
 
-static double NumVal; // Filled in if tok_number
+double NumVal; // Filled in if tok_number
+
+// Simple token buffer.
+// CurTok is current tokern the parser is looking at.
+int CurTok;
 
 // The actual implementation of the lexter is the gettok function
 // It is called to return the next token from the std input
-static int gettok(){
+int gettok(){
 	static int LastChar = ' ';
 	// Skip any whitespace
 	while (isspace(LastChar))
@@ -17,12 +20,12 @@ static int gettok(){
 
 	// idenfitify specific keyworkds (e.g., def)
 	if (isalpha(LastChar)){ // identifier [a-z A-Z 0-9]*
-		IndetifierStr = LastChar;
+		IdentifierStr = LastChar;
 		while (isalnum((LastChar = getchar())))
-			IndetifierStr+=LastChar;
-		if (IndetifierStr == "def")
+			IdentifierStr+=LastChar;
+		if (IdentifierStr == "def")
 			return tok_def;
-		if (IndetifierStr == "extern")
+		if (IdentifierStr == "extern")
 			return tok_extern;
 		return tok_identifier;
 
@@ -56,4 +59,9 @@ static int gettok(){
 	int ThisChar = LastChar;
 	LastChar = getchar();
 	return ThisChar;
+}
+
+// getNextToken reads another token from the Lexer and updated CurTok with its results.
+int getNextToken(){
+	return CurTok = gettok();
 }
