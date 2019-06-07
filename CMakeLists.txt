@@ -1,7 +1,8 @@
 project (Kaleidoscope)
 cmake_minimum_required (VERSION 2.6)
 SET(CMAKE_CXX_STANDARD 11)
-
+set(CMAKE_CXX_FLAGS_DEFAULT "-O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -O0")
 find_package(LLVM REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -16,7 +17,7 @@ add_executable(Kaleidoscope src/logger/logger.cpp src/lexer/lexer.cpp src/parser
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
-llvm_map_components_to_libnames(llvm_libs support core irreader)
+#llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-target_link_libraries(Kaleidoscope ${llvm_libs})
+#target_link_libraries(Kaleidoscope ${llvm_libs})
