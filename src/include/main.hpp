@@ -11,6 +11,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/IR/LegacyPassManager.h"
 
 // LLVM core data structures
 extern llvm::LLVMContext TheContext;
@@ -23,3 +24,5 @@ extern std::unique_ptr<llvm::Module> TheModule;
 
 // Values are defined in the current scope
 extern std::map<std::string, llvm::Value *> NamedValues;
+
+extern std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
