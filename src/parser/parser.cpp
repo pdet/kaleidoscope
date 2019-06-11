@@ -1,4 +1,3 @@
-#include "llvm/ADT/STLExtras.h"
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
@@ -7,16 +6,33 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "lexer/token.hpp"
 #include "lexer/lexer.hpp"
+
 #include "ast/ExprAST.hpp"
 #include "ast/NumberExprAST.hpp"
 #include "ast/VariableExprAST.hpp"
 #include "ast/CallExprAST.hpp"
 #include "ast/BinaryExprAST.hpp"
 #include "ast/FunctionAST.hpp"
+
 #include "logger/logger.hpp"
 #include "parser/parser.hpp"
+#include "main.hpp"
+
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/raw_ostream.h"
 
 //Holds the precedence for each binary operator that is defined
 static std::map<char,int> BinopPrecedence;
@@ -214,32 +230,48 @@ std::unique_ptr<FunctionAST> ParseTopLevelExpr() {
     return nullptr;
 }
 
+//===----------------------------------------------------------------------===//
+// Top-Level parsing and JIT Driver
+//===----------------------------------------------------------------------===//
+
 static void HandleDefinition() {
-  if (ParseDefinition()) {
-    fprintf(stderr, "Parsed a function definition.\n");
-  } else {
-    // Skip token for error recovery.
-    getNextToken();
-  }
+    if (auto FnAST = ParseDefinition()) {
+        if (auto *FnIR = FnAST->codegen()) {
+            fprintf(stderr, "Read function definition:");
+            FnIR->print(llvm::errs());
+            fprintf(stderr, "\n");
+        }
+    } else {
+        // Skip token for error recovery.
+        getNextToken();
+    }
 }
 
 static void HandleExtern() {
-  if (ParseExtern()) {
-    fprintf(stderr, "Parsed an extern\n");
-  } else {
-    // Skip token for error recovery.
-    getNextToken();
-  }
+    if (auto ProtoAST = ParseExtern()) {
+        if (auto *FnIR = ProtoAST->codegen()) {
+            fprintf(stderr, "Read extern: ");
+            FnIR->print(llvm::errs());
+            fprintf(stderr, "\n");
+        }
+    } else {
+        // Skip token for error recovery.
+        getNextToken();
+    }
 }
 
 static void HandleTopLevelExpression() {
-  // Evaluate a top-level expression into an anonymous function.
-  if (ParseTopLevelExpr()) {
-    fprintf(stderr, "Parsed a top-level expr\n");
-  } else {
-    // Skip token for error recovery.
-    getNextToken();
-  }
+    // Evaluate a top-level expression into an anonymous function.
+    if (auto FnAST = ParseTopLevelExpr()) {
+        if (auto *FnIR = FnAST->codegen()) {
+            fprintf(stderr, "Read top-level expression:");
+            FnIR->print(llvm::errs());
+            fprintf(stderr, "\n");
+        }
+    } else {
+        // Skip token for error recovery.
+        getNextToken();
+    }
 }
 
 
@@ -277,8 +309,14 @@ int main (){
   fprintf(stderr, "ready> ");
   getNextToken();
 
+  // Make the module, which holds all the code.
+  TheModule = llvm::make_unique<llvm::Module>("my cool jit", TheContext);
+
   // Run the main "interpreter loop" now.
   MainLoop();
+
+  // Print out all of the generated code.
+  TheModule->print(llvm::errs(), nullptr);
 
   return 0;
 }

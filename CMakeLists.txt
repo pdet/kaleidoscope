@@ -12,12 +12,14 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 include_directories(src/include)
-add_executable(Kaleidoscope src/logger/logger.cpp src/lexer/lexer.cpp src/parser/parser.cpp)
+add_executable(Kaleidoscope src/logger/logger.cpp src/lexer/lexer.cpp src/parser/parser.cpp src/ast/BinaryExprAST.cpp
+        src/ast/CallExprAST.cpp src/ast/FunctionAST.cpp src/ast/NumberExprAST.cpp src/ast/PrototypeAST.cpp
+        src/ast/VariableExprAST.cpp src/main.cpp)
 
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
-#llvm_map_components_to_libnames(llvm_libs support core irreader)
+llvm_map_components_to_libnames(llvm_libs support core irreader)
 
 # Link against LLVM libraries
-#target_link_libraries(Kaleidoscope ${llvm_libs})
+target_link_libraries(Kaleidoscope ${llvm_libs})
