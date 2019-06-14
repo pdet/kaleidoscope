@@ -12,6 +12,7 @@
 #include "ast/VariableExprAST.hpp"
 #include "ast/CallExprAST.hpp"
 #include "ast/BinaryExprAST.hpp"
+#include "ast/ForExprAST.hpp"
 
 #include "lexer/token.hpp"
 #include "lexer/lexer.hpp"
@@ -69,6 +70,60 @@ std:: unique_ptr<ExprAST> ParseIfExpr(){
     }
     return llvm::make_unique<IfExprAST>(std::move(Cond), std::move(Then),
                                         std::move(Else));
+
+}
+
+// for expr ::= 'for' identifier '= 'expr ',' expr (','expr)? 'in'expression
+std::unique_ptr<ExprAST> ParseForExpr(){
+    getNextToken(); // eat the for
+    if (CurTok != tok_identifier){
+        return LogError("expected identifier after for");
+    }
+    std::string IdName = IdentifierStr;
+    getNextToken(); // eat identifier
+    if(CurTok != '='){
+        return LogError("Expected \'=\' after for");
+    }
+    getNextToken(); // eat =
+
+    auto Start = ParseExpression();
+    if (!Start){
+        return nullptr;
+    }
+    if (CurTok != ','){
+        return LogError ("expected \',\' after the start value");
+    }
+    getNextToken();
+
+    auto End = ParseExpression();
+    if (!End){
+        return nullptr;
+    }
+    //The step value optional
+    std::unique_ptr<ExprAST> Step;
+    if (CurTok == ','){
+        getNextToken();
+        Step = ParseExpression();
+        if (!Step){
+            return nullptr;
+        }
+    }
+    if (CurTok != tok_in){
+        return LogError ("Expected \'in\'after for");
+    }
+    getNextToken(); // eat in
+
+    auto Body = ParseExpression();
+
+    if (!Body)
+        return nullptr;
+
+    return llvm::make_unique<ForExprAST>(IdName, std::move(Start),
+                                         std::move(End), std::move(Step),
+                                         std::move(Body));
+
+
+
 
 }
 

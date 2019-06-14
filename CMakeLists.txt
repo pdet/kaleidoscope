@@ -19,7 +19,7 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(src/include)
 add_executable(Kaleidoscope src/logger/logger.cpp src/lexer/lexer.cpp src/parser/parser.cpp src/ast/BinaryExprAST.cpp
         src/ast/CallExprAST.cpp src/ast/FunctionAST.cpp src/ast/NumberExprAST.cpp src/ast/PrototypeAST.cpp
-        src/ast/VariableExprAST.cpp src/util/global.cpp src/ast/IfExprAST.cpp
+        src/ast/VariableExprAST.cpp src/util/global.cpp src/ast/IfExprAST.cpp src/ast/ForExprAST.cpp
         src/main.cpp )
 
 
