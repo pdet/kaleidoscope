@@ -24,7 +24,7 @@ add_executable(Kaleidoscope src/logger/logger.cpp src/lexer/lexer.cpp src/parser
 
 # Find the libraries that correspond to the LLVM components
 # that we wish to use
-llvm_map_components_to_libnames(llvm_libs support core irreader mcjit native)
+llvm_map_components_to_libnames(llvm_libs core ExecutionEngine OrcJIT native)
 
 # Link against LLVM libraries
 target_link_libraries(Kaleidoscope ${llvm_libs})
