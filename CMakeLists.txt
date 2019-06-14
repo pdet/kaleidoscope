@@ -6,8 +6,8 @@ set(CMAKE_C_COMPILER /usr/local/Cellar/llvm/8.0.0_1/bin/clang CACHE PATH "" FORC
 set(CMAKE_CXX_COMPILER /usr/local/Cellar/llvm/8.0.0_1/bin/clang++ CACHE PATH "" FORCE)
 
 SET(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS_DEFAULT "-O0 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -O0")
+set(CMAKE_CXX_FLAGS_DEFAULT "-O0 -g")
 find_package(LLVM REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
@@ -19,7 +19,8 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(src/include)
 add_executable(Kaleidoscope src/logger/logger.cpp src/lexer/lexer.cpp src/parser/parser.cpp src/ast/BinaryExprAST.cpp
         src/ast/CallExprAST.cpp src/ast/FunctionAST.cpp src/ast/NumberExprAST.cpp src/ast/PrototypeAST.cpp
-        src/ast/VariableExprAST.cpp src/util/global.cpp src/main.cpp)
+        src/ast/VariableExprAST.cpp src/util/global.cpp src/ast/IfExprAST.cpp
+        src/main.cpp )
 
 
 # Find the libraries that correspond to the LLVM components

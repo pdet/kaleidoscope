@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "ast/IfExprAST.hpp"
 #include "ast/NumberExprAST.hpp"
 #include "ast/VariableExprAST.hpp"
 #include "ast/CallExprAST.hpp"
@@ -40,6 +41,35 @@ std::unique_ptr<ExprAST> ParseNumberExpr() {
     auto Result = llvm::make_unique<NumberExprAST>(NumVal);
     getNextToken(); // consume the number
     return std::move(Result);
+}
+
+// ifexpr::= 'if' expression 'then'expression 'else' expression
+std:: unique_ptr<ExprAST> ParseIfExpr(){
+    getNextToken(); // eat if
+    auto Cond = ParseExpression();     //condition
+    if (!Cond){
+        return nullptr;
+    }
+    if (CurTok != tok_then){
+        return LogError("Expected then");
+    }
+    getNextToken(); // eat then
+    auto Then = ParseExpression();
+    if (!Then){
+        return nullptr;
+    }
+    if (CurTok != tok_else){
+        return LogError("expected else");
+    }
+    getNextToken(); // eat else
+
+    auto Else = ParseExpression();
+    if (!Else){
+        return nullptr;
+    }
+    return llvm::make_unique<IfExprAST>(std::move(Cond), std::move(Then),
+                                        std::move(Else));
+
 }
 
 // Parses expressions in "(" and ")"
@@ -108,6 +138,8 @@ std::unique_ptr<ExprAST> ParsePrimary() {
             return ParseNumberExpr();
         case '(':
             return ParseParenExpr();
+        case tok_if:
+            return ParseIfExpr();
     }
 }
 

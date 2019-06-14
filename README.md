@@ -23,6 +23,7 @@ fib(40)
 ## Components
 
 ### Lexer
-Gets a stream of chars and breaks them into "tokens"
+Gets a stream of chars and breaks them into "tokens".
+
 include/lexer/token.hpp has an ENUM structure with the token identifiers used in lexical analysis.
 lexer/lexer.cpp has the gettok function that reads characters from stdin and gransforms them into tokens.
