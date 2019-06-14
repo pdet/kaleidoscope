@@ -1,5 +1,10 @@
 project (Kaleidoscope)
 cmake_minimum_required (VERSION 2.6)
+
+set(CMAKE_C_COMPILER /usr/local/Cellar/llvm/8.0.0_1/bin/clang CACHE PATH "" FORCE)
+
+set(CMAKE_CXX_COMPILER /usr/local/Cellar/llvm/8.0.0_1/bin/clang++ CACHE PATH "" FORCE)
+
 SET(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS_DEFAULT "-O0 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -O0")
