@@ -1,10 +1,11 @@
 #include "ast/CallExprAST.hpp"
+#include "util/global.hpp"
 
 // We first lookup in the LLVM Module's symbolical table for the function name
 // After having the function we need to call, every argument is recursively codegen.
 llvm::Value *CallExprAST::codegen() {
     // Look up the name in the global module table
-    llvm::Function *CalleeF = TheModule->getFunction(Callee);
+    llvm::Function *CalleeF = getFunction(Callee);
     if (!CalleeF){
         return LogErrorV("Unkown function referenced");
     }

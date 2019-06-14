@@ -16,7 +16,6 @@
 #include "lexer/lexer.hpp"
 #include "logger/logger.hpp"
 #include "parser/parser.hpp"
-#include "main.hpp"
 
 //Holds the precedence for each binary operator that is defined
 std::map<char,int> BinopPrecedence;

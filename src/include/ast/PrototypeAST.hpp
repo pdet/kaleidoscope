@@ -3,7 +3,6 @@
 #include <vector>
 #include "ast/ExprAST.hpp"
 #include "llvm/IR/IRBuilder.h"
-#include "main.hpp"
 
 // This reprensets the "prototype" for a funciton
 // captures its name, and its argument names

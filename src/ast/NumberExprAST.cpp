@@ -1,5 +1,5 @@
 #include "ast/NumberExprAST.hpp"
-
+#include "util/global.hpp"
 // Numeric contants are represented with the ConstantFP class
 // It holds the numeric value in an APFloat (which has the capacity of holding floating points)
 // LLVM constants are uniquely created, hence foo::get()

@@ -1,4 +1,5 @@
 #include "ast/VariableExprAST.hpp"
+#include "util/global.hpp"
 
 // Assume Variable has been emmited somewhere thus is already available.
 // The only values that can be in NamedValues map are function arguments

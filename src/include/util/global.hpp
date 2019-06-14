@@ -13,6 +13,10 @@
 #include "llvm/IR/Verifier.h"
 #include "llvm/IR/LegacyPassManager.h"
 
+#include "KaleidoscopeJIT.hpp"
+#include "ast/PrototypeAST.hpp"
+
+
 // LLVM core data structures
 extern llvm::LLVMContext TheContext;
 
@@ -26,3 +30,9 @@ extern std::unique_ptr<llvm::Module> TheModule;
 extern std::map<std::string, llvm::Value *> NamedValues;
 
 extern std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
+
+extern std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
+
+extern std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
+
+llvm::Function *getFunction(std::string name);

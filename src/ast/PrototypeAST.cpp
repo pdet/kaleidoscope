@@ -1,5 +1,5 @@
 #include "ast/PrototypeAST.hpp"
-
+#include "util/global.hpp"
 // It returns an LLVM Function
 
 llvm::Function *PrototypeAST::codegen() {

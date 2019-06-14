@@ -1,6 +1,8 @@
 #pragma once
+
 #include "PrototypeAST.hpp"
 #include "logger/logger.hpp"
+
 // Function definition itself
 class FunctionAST{
 	std::unique_ptr<PrototypeAST> Proto;

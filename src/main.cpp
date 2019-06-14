@@ -1,34 +1,16 @@
-#include "main.hpp"
+#include "util/global.hpp"
 #include "lexer/lexer.hpp"
-#include "parser/parser.hpp"
 #include "lexer/token.hpp"
 #include "llvm/Support/raw_ostream.h"
-#include "KaleidoscopeJIT.hpp"
+#include "util/KaleidoscopeJIT.hpp"
 
 //Optimization Passes imports
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Scalar.h"
-
-// This is an object that owns LLVM core data structures
-llvm::LLVMContext TheContext;
-
-// This is a helper object that makes easy to generate LLVM instructions
-llvm::IRBuilder<> Builder(TheContext);
-
-// This is an LLVM construct that contains functions and global variables
-std::unique_ptr<llvm::Module> TheModule;
-
-// This map keeps track of which values are defined in the current scope
-std::map<std::string, llvm::Value *> NamedValues;
-
-std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
-
-std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
-
+#include "parser/parser.hpp"
 //===----------------------------------------------------------------------===//
 // Top-Level parsing and JIT Driver
 //===----------------------------------------------------------------------===//
-
 
 // Optimizer
 void InitializeModuleAndPassManager(void){
@@ -62,6 +44,9 @@ static void HandleDefinition() {
             fprintf(stderr, "Read function definition:");
             FnIR->print(llvm::errs());
             fprintf(stderr, "\n");
+            //Transfer the newly defined function to the JIT and open a new module.
+            TheJIT->addModule(std::move(TheModule));
+            InitializeModuleAndPassManager();
         }
     } else {
         // Skip token for error recovery.
@@ -75,6 +60,8 @@ static void HandleExtern() {
             fprintf(stderr, "Read extern: ");
             FnIR->print(llvm::errs());
             fprintf(stderr, "\n");
+            FunctionProtos[ProtoAST->getName()] = std::move(ProtoAST); // Add the prototype to functionprotos
+
         }
     } else {
         // Skip token for error recovery.
@@ -104,7 +91,7 @@ static void HandleTopLevelExpression() {
             //There is no difference beween JIT compiled code and native machine code that is statically linked to the
             //application
             double (*FP)() = (double (*)())(intptr_t)cantFail(ExprSymbol.getAddress());
-            fprintf(stderr, "Evaluated to %f\n", FP());
+            fprintf(stderr, "\nEvaluated to %f\n", FP());
 
             // Delete the anonymous expression module from the JIT.
             // Since we don'' support re-evaluation of top-level expressions we remove the module from the JIT to free
@@ -139,6 +126,24 @@ static void MainLoop() {
         }
     }
 }
+
+//===----------------------------------------------------------------------===//
+// Extend the language with cpp functions
+//===----------------------------------------------------------------------===//
+// For windows we need to actually export the functions because the dynamic symbol loader will use GetProcAddress to
+// find the symbols
+#ifdef _WIN32
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLEXPORT
+#endif
+
+/// putchard - putchar that takes a double and returns 0.
+extern "C" DLLEXPORT double putchard(double X) {
+    fputc((char)X, stderr);
+    return 0;
+}
+
 
 
 int main (){
